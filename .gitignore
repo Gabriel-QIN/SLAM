@@ -1,9 +1,0 @@
-Datasets/Structure
-*zip
-.gitignore
-codes/*py
-!/codes/
-*pt
-*pyc
-*ipynb
-Models/
