@@ -186,7 +186,9 @@ Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23
 
 If you find SLAM helpful in your study, please kindly cite the following paper:
 
+*[APA format]*
 
+or
 
 BibTeX entry:
 
