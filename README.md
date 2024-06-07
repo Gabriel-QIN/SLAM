@@ -18,12 +18,6 @@ This is a repository containing source code for paper title "SLAM: structure-awa
 
 ![method](./assets/method.png)
 
-## Ablation studies
-
-​	Since whether each sub-encoder of SLAM is essential for Kbhb prediction remains uncertain, a number of ablation experiments had been conducted. Specifically, we respectively removed structure encoder, ProtBert encoder, 1DCNN encoder, BiLSTM encoder, feature encoder and attention module in the SLAM model. As illustrated in the below figure, we can notice that removal of each sub-module of SLAM all leads to decline of AUROC, ranging from 0.009 to 0.023, and AUPRC values, ranging from 0.003 to 0.025. For other overall evaluation metrics, such as MCC and F1-score, SLAM model without each sub-module exhibited worsen performance. Among all of the six ablation experiments, the contribution of structure encoder, feature encoder and ProtBert encoder appears to be the highest, leading to decrease of 0.020, 0.023 and 0.022 in AUROC values, respectively. It follows that the structure information, embedding taken from ProtBert and manual encodings exhibit informative features that are key for accurate identification of Kbhb sites. CNN and BiLSTM encoders have the least influence, decreasing AUROC values less than 0.1. We suppose that the reason is the SLAM model can obtain information from five sequence-based encoders and the model can learn information from other sequence encoders when removing these two embedding-based sequence encoders. For indicators including Acc, Rec, Pre and Spe, the SLAM stably maintained around 0.8, while ablated models showed erratic patterns. For instance, after removing structure encoder, the Pre and Spe declined from 0.796 and 0.795 to 0.728 and 0.674, although its Rec hit 0.873, the highest among all the ablation experiments.
-
-![ablation](./assets/ablation.png)
-
 # Requirements
 
 Python version: >=`3.7.*`
