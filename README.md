@@ -33,7 +33,7 @@ Several common packages are used in this project.
 
 Using the following commands to create your own conda environment:
 
-First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) or [Miniconda](https://docs.anaconda.com/free/miniconda/)) installed in your machine  using command `which conda` (for Linux).
+First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) or [Miniconda](https://docs.anaconda.com/free/miniconda/) installed in your machine  using command `which conda` (for Linux).
 
 ## Step1
 
@@ -100,11 +100,11 @@ After done the required installations,  you can quickly re-train our model or pr
 
 3. Plotting
 
-   - [Draw_figures.ipynb](https://github.com/Gabriel-QIN/SLAM/blob/master/Plots/Draw_figures.ipynb)
+   - [draw_figures.ipynb](https://github.com/Gabriel-QIN/SLAM/blob/master/Plots/draw_figures.ipynb)
 
 4. Case study
 
-   -  [Case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/Case study.ipynb)
+   -  [case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/case study.ipynb)
 
    
 
