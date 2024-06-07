@@ -20,7 +20,7 @@ This is a repository containing source code for paper title "SLAM: structure-awa
 
 # Requirements
 
-Python version: >=`3.7.*`
+Python version: >=`3.7`
 
 Several common packages are used in this project.
 
