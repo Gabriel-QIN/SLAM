@@ -1,6 +1,9 @@
 # SLAM
 
-This is a repository containing source code for paper title "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
+******
+>This is a repository containing source code for paper title "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
+
+***
 
 # Introduction
 
@@ -67,28 +70,49 @@ python -c "import torch; print(torch.cuda.device_count())"	# Should be > 0
 python -c "import torch; print(torch.__version__);print(torch.version.cuda)"
 ```
 
-For more information, please follow the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG)](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+For more information, please follow the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
 
 
 
 # Getting started
 
-After done the required installations,  you can quickly re-train our model or predict your own data with high-throughput.
+After done the required installations,  you can quickly re-train our model or predict your own data in a high-throughput manner.
 
 
 
 # Descriptions of this repository
 
 1. Codes
+
+   - [dataset.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/dataset.py)
+   - [model.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/model.py)
+   - [metrics.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/metrics.py)
+   - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py)
+   - [SLAM_seq.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_seq.py)
+   - [SLAM_cv.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py)
+
 2. Datasets
+
+   - Sequence datasets: 
+     - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
+     - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
+   - Structure datasets: please download from [network disk](https://github.com/Gabriel-QIN/SLAM) when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py).
+
 3. Plotting
+
+   - [Draw_figures.ipynb](https://github.com/Gabriel-QIN/SLAM/blob/master/Plots/Draw_figures.ipynb)
+
 4. Case study
 
+   -  [Case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/Case study.ipynb)
 
+   
 
 # Evaluation on species-specific datasets
 
 ## 1. Evaluation on independent test sets
+
+For more information, please refer to the source code for [SLAM](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py).
 
 ```sh
 dataset=Datasets
@@ -96,8 +120,6 @@ sp=general
 gpu=0
 python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train.fa --test Datasets/${sp}_test.fa --gpu ${gpu} --seed 2024
 ```
-
-
 
 ![species-specific results](./assets/species_specific.png)
 
@@ -114,6 +136,15 @@ python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_predi
 
 ## 2. Evaluation using 5-fold cross-validation
 
+For more information, please refer to the code for [5-fold cross-validation](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py).
+
+```sh
+dataset=Datasets
+sp=general
+gpu=0
+python codes/SLAM_cv.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train.fa --test Datasets/${sp}_test.fa --gpu ${gpu} --seed 2024
+```
+
 
 
 |   Species   | Accuracy | Recall | Precision | F1-score | Specificity |  MCC  |  AUC  | AUPRC |
@@ -127,7 +158,7 @@ python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_predi
 
 # Reproducing artworks in SLAM paper
 
-Please kindly follow the instructions in the jupyter notebook: `Draw_figures.ipynb`
+Please kindly follow the instructions in the jupyter notebook: [Draw_figure](https://github.com/Gabriel-QIN/SLAM/tree/master/assets/Draw_figures.ipynb).
 
 
 
@@ -172,4 +203,4 @@ BibTeX entry:
 
 # License
 
-This repository is licensed under the terms of the **Apache 2.0** license.
+This repository is licensed under the terms of the **Apache 2.0** [license](https://github.com/Gabriel-QIN/SLAM/blob/master/LICENSE).
