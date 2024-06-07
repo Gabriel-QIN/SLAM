@@ -1,6 +1,8 @@
 Datasets/Structure
 *zip
+.gitignore
 *py
 *pt
 *pyc
+*ipynb
 Models/
