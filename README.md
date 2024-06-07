@@ -6,7 +6,7 @@ This is a repository containing source code for paper title "SLAM: structure-awa
 
 ​	Post-translational modifications (PTM) in proteins expand the functional diversity that are vital for their functions and stability. As a newly-reported PTM, lysine β-hydroxybutyrylation (Kbhb) presents a new avenue to regulate chromatin and diverse functions. Therefore, accurate and efficient prediction of Kbhb sites is imperative. However, the current experimental methods for identifying PTM sites are often expensive and time-consuming. Up to now, there is no computational method for Kbhb sites detection. To this end, we present the first deep learning-based method, termed SLAM, to *in silico* identify lysine β-hydroxybutyrylation. The performance of SLAM is evaluated on both 5-fold cross-validation and independent test sets for general and three species, achieving 0.876, 0.873, 0.856 and 0.884 in terms of AUC values, respectively on the general and species-specific independent test sets. Furthermore, we found that the species-specific prediction is important for organism with large-scale data, and general prediction still servers as the best approach in species with small-sized dataset. With various *in silico* experiments, it is confirmed that structure, and information obtained from protein language model and handcrafted features are key contributors to a robust and accurate predictor. As one example, we predicted the potential Kbhb sites in human S-adenosyl-L-homocysteine hydrolase, which is in agreement with experimentally-verified Kbhb sites. Taken together, our method could enable accurate and efficient discovery of novel Kbhb sites that are crucial for the function and stability of proteins and could be applied in the structure-guided identification of other important PTMs. The web-server of SLAM is freely accessible at XXX.
 
-![SLAM overall framework](assets/SLAM_framework.png)
+![SLAM overall framework](./assets/SLAM_framework.png)
 
 
 
@@ -16,13 +16,13 @@ This is a repository containing source code for paper title "SLAM: structure-awa
 
 ​	Hence, we present a hybrid deep learning neural Networks combining Structure and LAnguage-Model constraints (SLAM), for species-specific and general protein lysine β-hydroxybutyrylation site prediction. The developed geometric deep learning framework includes 1) a multi-track encoder module to concurrently embed the protein structure and sequence features into a latent representation; 2) a decoder layer consisting of an attention layer and a multi-layer perceptron followed with a sigmoid function for downstream classification. The sequence encoder is designed as hybrid deep learning neural networks to learn dependencies between residues with two-track feature encoders and two-track adaptive encoders. Adaptive encoders enable learn-from-data for SLAM by using learnable word embeddings, and feature encoders privodes expert-level information and evolutionary constraints extracted from protein language model. For structure encoder, a multi-layer graph neural network (GNN) is implemented to capture high-level residue relationships considering geometry. 
 
-![method](README/method.png)
+![method](./assets/method.png)
 
 ## Ablation studies
 
 ​	Since whether each sub-encoder of SLAM is essential for Kbhb prediction remains uncertain, a number of ablation experiments had been conducted. Specifically, we respectively removed structure encoder, ProtBert encoder, 1DCNN encoder, BiLSTM encoder, feature encoder and attention module in the SLAM model. As illustrated in the below figure, we can notice that removal of each sub-module of SLAM all leads to decline of AUROC, ranging from 0.009 to 0.023, and AUPRC values, ranging from 0.003 to 0.025. For other overall evaluation metrics, such as MCC and F1-score, SLAM model without each sub-module exhibited worsen performance. Among all of the six ablation experiments, the contribution of structure encoder, feature encoder and ProtBert encoder appears to be the highest, leading to decrease of 0.020, 0.023 and 0.022 in AUROC values, respectively. It follows that the structure information, embedding taken from ProtBert and manual encodings exhibit informative features that are key for accurate identification of Kbhb sites. CNN and BiLSTM encoders have the least influence, decreasing AUROC values less than 0.1. We suppose that the reason is the SLAM model can obtain information from five sequence-based encoders and the model can learn information from other sequence encoders when removing these two embedding-based sequence encoders. For indicators including Acc, Rec, Pre and Spe, the SLAM stably maintained around 0.8, while ablated models showed erratic patterns. For instance, after removing structure encoder, the Pre and Spe declined from 0.796 and 0.795 to 0.728 and 0.674, although its Rec hit 0.873, the highest among all the ablation experiments.
 
-![ablation](README/ablation.png)
+![ablation](./assets/ablation.png)
 
 # Requirements
 
@@ -105,7 +105,7 @@ python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_predi
 
 
 
-![species-specific results](assets/species_specific.png)
+![species-specific results](./assets/species_specific.png)
 
 
 
