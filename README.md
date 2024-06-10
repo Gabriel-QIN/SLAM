@@ -21,7 +21,7 @@ Here, we present a hybrid deep learning neural Networks combining Structure and 
 
 ![method](./assets/method.png)
 
-# Requirements
+## Requirements
 
 Python version: >=`3.7`
 
@@ -35,14 +35,14 @@ Using the following commands to create your own conda environment:
 
 First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) or [Miniconda](https://docs.anaconda.com/free/miniconda/) installed in your machine  using command `which conda` (for Linux).
 
-## Step1
+### Step1
 
 ```sh
 conda create -n SLAM python==3.7 && conda activate SLAM
 pip install numpy pandas matplotlib biopython scikit-learn transformers
 ```
 
-## Step2
+### Step2
 
 For PyTorch and PyTorch geometric (PyG):
 
@@ -74,13 +74,15 @@ For more information, please refer to the official documentation of [PyTorch ](h
 
 
 
-# Getting started
+## Getting started
 
 After finishing the required installations,  you can quickly re-train our model or predict your own data in a high-throughput manner.
 
 
 
-# Descriptions of this repository
+# Reproducing the SLAM method
+
+## Descriptions of this repository
 
 1. Codes
 
@@ -112,9 +114,9 @@ After finishing the required installations,  you can quickly re-train our model 
 
    
 
-# Evaluation on species-specific datasets
+## Evaluation on species-specific datasets
 
-## 1. Evaluation on independent test sets
+### 1. Evaluation on independent test sets
 
 For more information, please refer to the source code for [SLAM](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py).
 
@@ -138,7 +140,7 @@ python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_predi
 
 
 
-## 2. Evaluation using 5-fold cross-validation
+### 2. Evaluation using 5-fold cross-validation
 
 For more information, please refer to the code for [5-fold cross-validation](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py).
 
@@ -160,13 +162,13 @@ python codes/SLAM_cv.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_pr
 
 
 
-# Reproducing artworks in SLAM paper
+## Reproducing artworks in SLAM paper
 
 Please kindly follow the instructions in the jupyter notebook: [Draw_figure](https://github.com/Gabriel-QIN/SLAM/tree/master/assets/Draw_figures.ipynb).
 
 
 
-# Case study on AHCY
+## Case study on AHCY
 
 AHCY, short for S-adenosyl-L-homocysteine hydrolase, is the only enzyme that can hydrolyze SAH in mammalian[1]. In human cells, it is reported that the loss of AHCY is a causal factor for embryonic lethality[2], and the deficiency can lead to numerous diseases, including neurological disorders, cancer (e.g., hepatocellular carcinoma), early childhood death, and myopathy[3].  Despite the functional investigation of AHCY by previous experimental studies, its regulation remains largely underexplored. Previous studies had already confirmed that AHCY is a bona fide target of Kbhb which could potentially exerts impact on the enzymatic activity[4]. They found that the AHCY activity was attenuated after an 8h treatment of 10mM Na-β-OHB treatment[4]. 
 
