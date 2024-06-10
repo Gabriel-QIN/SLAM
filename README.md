@@ -70,7 +70,17 @@ python -c "import torch; print(torch.cuda.device_count())"	# Should be > 0
 python -c "import torch; print(torch.__version__);print(torch.version.cuda)"
 ```
 
-For more information, please refer to the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+For **CPU** version, please refer to the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+
+### Alternative
+
+You can simply  can use this `requirements.txt` file to install all the dependencies.
+
+```sh
+pip install -r requirements.txt
+```
+
+You can read more in [Virtualenv and pip Basics](http://jonathanchu.is/posts/virtualenv-and-pip-basics/), and the official [Requirements File Format](https://pip.pypa.io/en/stable/cli/pip_install/) documentation.
 
 
 
