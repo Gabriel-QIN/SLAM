@@ -46,7 +46,7 @@ pip install numpy pandas matplotlib biopython scikit-learn transformers
 
 For PyTorch and PyTorch geometric (PyG):
 
-You can use install via Anaconda:
+You can install via Anaconda:
 
 ```sh
 conda install pytorch==1.13.1 pytorch-cuda=11.7 -c pytorch -c nvidia
@@ -54,7 +54,7 @@ pip install torch_geometric
 conda install pyg=*=*cu* -c pyg
 ```
 
-Or using wheels:
+Or install by wheels:
 
 ```sh
 pip install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
@@ -70,13 +70,13 @@ python -c "import torch; print(torch.cuda.device_count())"	# Should be > 0
 python -c "import torch; print(torch.__version__);print(torch.version.cuda)"
 ```
 
-For more information, please follow the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+For more information, please refer to the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
 
 
 
 # Getting started
 
-After done the required installations,  you can quickly re-train our model or predict your own data in a high-throughput manner.
+After finishing the required installations,  you can quickly re-train our model or predict your own data in a high-throughput manner.
 
 
 
@@ -97,6 +97,10 @@ After done the required installations,  you can quickly re-train our model or pr
      - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
      - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
    - Structure datasets: please download from [network disk](https://github.com/Gabriel-QIN/SLAM) when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py).
+
+3. Models
+
+   - Please download the pickled models from [network disk](https://github.com/Gabriel-QIN/SLAM).
 
 3. Plotting
 
