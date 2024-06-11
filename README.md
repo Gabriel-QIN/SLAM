@@ -209,7 +209,7 @@ or
 BibTeX entry:
 
 ```bibtex
-@article{auto-kla,
+@article{SLAM,
     title={SLAM: structure-aware lysine beta-hydroxybutyrylation prediction with protein language model},
     author={Zhao-hui Qin, Zhen Chen},
     journal={bioRxiv},
