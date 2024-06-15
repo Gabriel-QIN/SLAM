@@ -13,7 +13,7 @@ Post-translational modifications (PTM) in proteins expand the functional diversi
 
 
 
-# Method summary
+# SLAM Method summary
 
 ## Architecture
 
@@ -39,7 +39,7 @@ First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/
 
 ```sh
 conda create -n SLAM python==3.7 && conda activate SLAM
-pip install numpy pandas matplotlib biopython scikit-learn transformers
+pip install numpy pandas matplotlib seaborn biopython scikit-learn transformers
 ```
 
 ### Step2
@@ -62,6 +62,14 @@ pip install torch_geometric
 pip install torch_scatter torch_cluster --no-index -f https://data.pyg.org/whl/torch-1.13.1+cu117.html
 ```
 
+If you are running on a CPU-only machine, it is recommended to install the CPU version of these packages using following commands:
+
+```sh
+pip install torch==1.13.1
+pip install torch_geometric
+pip install torch_scatter torch_cluster -f https://data.pyg.org/whl/torch-1.13.1+cpu.html
+```
+
 Finally, check the installations by:
 
 ```python
@@ -70,7 +78,7 @@ python -c "import torch; print(torch.cuda.device_count())"	# Should be > 0
 python -c "import torch; print(torch.__version__);print(torch.version.cuda)"
 ```
 
-For **CPU** version, please refer to the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+For more information, please refer to the official documentation of [PyTorch ](https://pytorch.org/get-started/locally/)and [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
 
 ### Alternative
 
