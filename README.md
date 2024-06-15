@@ -104,12 +104,12 @@ After finishing the required installations,  you can quickly re-train our model 
 
 1. Codes
 
-   - [dataset.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/dataset.py)
-   - [model.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/model.py)
-   - [metrics.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/metrics.py)
-   - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py)
-   - [SLAM_seq.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_seq.py)
-   - [SLAM_cv.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py)
+   - [dataset.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/dataset.py) : dataset preparation and processing
+   - [model.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/model.py) : PyTorch-version SLAM model
+   - [metrics.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/metrics.py) : validation metrics and additional utils
+   - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) : for structure-guided SLAM prediction
+   - [SLAM_seq.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_seq.py) : for sequence-based prediction
+   - [SLAM_cv.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py) : for cross-validation
 
 2. Datasets
 
