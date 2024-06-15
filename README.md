@@ -116,7 +116,7 @@ After finishing the required installations,  you can quickly re-train our model 
    - Sequence datasets: 
      - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
      - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
-   - Structure datasets: please download from [network disk](https://github.com/Gabriel-QIN/SLAM) when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py).
+   - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
 
 3. Models
 
