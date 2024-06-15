@@ -1,6 +1,9 @@
 #!/bin/python
 # -*- coding:utf-8 -*- 
 
+# Thanks for PiFold
+# https://github.com/A4Bio/PiFold
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

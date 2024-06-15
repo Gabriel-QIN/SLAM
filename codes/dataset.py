@@ -13,6 +13,10 @@ from tqdm import tqdm
 from torch_geometric.data import Data
 from torch_geometric.nn import radius_graph
 
+# Thanks for StructTrans and PiFold
+# https://github.com/jingraham/neurips19-graph-protein-design
+# https://github.com/A4Bio/PiFold
+
 atoms = ['N', 'CA', 'C', 'O', 'R', 'CB']
 n_atoms = len(atoms)
 atom_idx = {atom:atoms.index(atom) for atom in atoms}
