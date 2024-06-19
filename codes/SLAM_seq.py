@@ -510,7 +510,7 @@ if __name__=='__main__':
     
     train_file = args.train
     seqlist = [record for record in SeqIO.parse(train_file, "fasta")]
-    train_list, valid_list = random_split(seqlist, 0.2, seed=SEED):
+    train_list, valid_list = random_split(seqlist, 0.2, seed=SEED)
     train_ds = SLAMDatasetSeq(train_file, tokenizer, feature=manual_fea)
     valid_ds = SLAMDatasetSeq(valid_list, tokenizer, feature=manual_fea)
 
@@ -534,7 +534,7 @@ if __name__=='__main__':
     max_patience = args.patience
 
     desc=['Project', 'Epoch', 'Acc', 'th','Rec/Sn', 'Pre', 'F1', 'Spe', 'MCC', 'AUROC', 'AUPRC', 'TN', 'FP', 'FN', 'TP']
-        for epoch in range(num_epochs):
+    for epoch in range(num_epochs):
         # Training
         start = time.perf_counter()
         train_step_loss, train_acc, train_loss, step = train_one_epoch(train_loader, model, device, optimizer, criterion)

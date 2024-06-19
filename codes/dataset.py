@@ -21,7 +21,7 @@ atoms = ['N', 'CA', 'C', 'O', 'R', 'CB']
 n_atoms = len(atoms)
 atom_idx = {atom:atoms.index(atom) for atom in atoms}
 
-def random_split(datalist, ratio, seed=SEED):
+def random_split(datalist, ratio, seed=42):
     """Randomly split dataset list into train and test."""
     random.seed(seed)
     random.shuffle(datalist)

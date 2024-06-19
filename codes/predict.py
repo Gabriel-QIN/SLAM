@@ -212,11 +212,9 @@ def predict_engine(seq_path, pdb_path, threshold=0.4, species='general', chain='
 def draw_scatter_ptm(case, savename='scatter.png', threshold=0.4):
     x_min = case['Position'].min()
     x_max = case['Position'].max()
-    
-    # 动态调整 figsize
     x_range = x_max - x_min
-    fig_width = max(10, x_range / 10)  # 图表宽度动态调整，确保最小宽度为10
-    fig_height = 6  # 图表高度固定为6
+    fig_width = max(10, x_range / 10)
+    fig_height = 6
     plt.figure(figsize=(fig_width, fig_height))
     palette = []
     for score in case['Score']:
@@ -245,10 +243,9 @@ def draw_ptm(kbhb, savename='kbhb.png', threshold=0.4):
     x_min = kbhb['Position'].min()
     x_max = kbhb['Position'].max()
     
-    # 动态调整 figsize
     x_range = x_max - x_min
-    fig_width = max(10, x_range / 10)  # 图表宽度动态调整，确保最小宽度为10
-    fig_height = 6  # 图表高度固定为6
+    fig_width = max(10, x_range / 10) 
+    fig_height = 6 
     plt.figure(figsize=(fig_width, fig_height))
     palette = []
     for score in kbhb['Score']:
@@ -273,6 +270,21 @@ def draw_ptm(kbhb, savename='kbhb.png', threshold=0.4):
     plt.xticks(rotation=45, ha='right')
     plt.savefig(savename,dpi=600)
 
+def draw_pie_chart_ptm(case, savename='pie_chart.png', threshold=0.4):
+    high_confidence = sum(1 for score in case['Score'] if score > 0.8)
+    medium_confidence = sum(1 for score in case['Score'] if 0.5 <= score <= 0.8)
+    low_confidence = sum(1 for score in case['Score'] if threshold <= score < 0.5)
+    extremely_low_confidence = sum(1 for score in case['Score'] if score < threshold)
+
+    sizes = [high_confidence, medium_confidence, low_confidence, extremely_low_confidence]
+    labels = ['High confidence', 'Medium confidence', 'Low confidence', 'Extremely low confidence']
+    colors = ['red', 'orange', 'pink', '#E5E1DA']
+
+    plt.figure()
+    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=0, wedgeprops=dict(edgecolor='grey'))
+
+    plt.savefig(savename, dpi=600)
+
 if __name__=='__main__':
     chain = 'A'
     pdb_path = f'../case_study/5w49.pdb'
@@ -284,5 +296,7 @@ if __name__=='__main__':
         threshold = 0.4
     case, kbhb = predict_engine(seq_path, pdb_path, threshold=threshold, species=species, chain=chain, use_PLM=use_PLM)
     print(case)
-    draw_ptm(kbhb, savename='bar.png', threshold=threshold)
-    draw_scatter_ptm(case, savename='scatter.png', threshold=threshold)
+    draw_ptm(kbhb, savename='../case_study/bar.png', threshold=threshold)
+    draw_scatter_ptm(case, savename='../case_study/scatter.png', threshold=threshold)
+    draw_scatter_ptm(case, savename='../case_study/scatter.png', threshold=threshold)
+    draw_pie_chart_ptm(case, savename='../case_study/pie_chart.png', threshold=threshold)

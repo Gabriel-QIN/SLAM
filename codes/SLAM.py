@@ -214,7 +214,7 @@ if __name__=='__main__':
 
     train_file = args.train
     train_list_all = [record for record in SeqIO.parse(train_file, "fasta")]
-    train_list, valid_list = random_split(train_list_all, 0.2, seed=SEED):
+    train_list, valid_list = random_split(train_list_all, 0.2, seed=SEED)
     train_ds = SLAMDataset(train_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
     valid_ds = SLAMDataset(valid_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
     
