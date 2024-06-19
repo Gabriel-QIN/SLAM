@@ -18,6 +18,7 @@ from transformers import AutoModel, AutoTokenizer
 from Bio import SeqIO
 from tqdm import tqdm
 from metrics import eval_metrics
+from dataset import random_split
 
 def print_results(data, desc=['Epoch', 'Acc', 'th','Rec/Sn', 'Pre', 'F1', 'Spe', 'MCC', 'AUROC', 'AUPRC', 'TN', 'FP', 'FN', 'TP']):
     print('\t'.join(desc))
@@ -80,15 +81,13 @@ def BINA(fastas, **kw):
     return arr
 
 class SLAMDatasetSeq(object):
-    def __init__(self, sample_file, tokenizer, feature=None):
+    def __init__(self, seqlist, tokenizer, feature=None):
         self.seq_list = []
         self.label_list = []
         self.feature_list = []
         self.tokenizer = tokenizer
         self.feature = feature
         ind = 0
-        seqlist = [record for record in SeqIO.parse(sample_file, "fasta")]
-        
         for record in tqdm(seqlist):
             seq = str(record.seq)
             desc = record.id.split('|')
@@ -510,13 +509,17 @@ if __name__=='__main__':
         BERT_encoder = None
     
     train_file = args.train
+    seqlist = [record for record in SeqIO.parse(train_file, "fasta")]
+    train_list, valid_list = random_split(seqlist, 0.2, seed=SEED):
     train_ds = SLAMDatasetSeq(train_file, tokenizer, feature=manual_fea)
+    valid_ds = SLAMDatasetSeq(valid_list, tokenizer, feature=manual_fea)
+
     test_file = args.test
     test_ds = SLAMDatasetSeq(test_file, tokenizer, feature=manual_fea)
     window_size = test_ds.win_size
     train_loader = DataLoader(train_ds,batch_size=batch_size,shuffle=True,num_workers=cpu,prefetch_factor=2)
-    valid_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, prefetch_factor=2)
-
+    valid_loader = DataLoader(valid_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, prefetch_factor=2)
+    test_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, prefetch_factor=2)
     model = SLAMNetSeq(BERT_encoder=None, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,win_size=window_size,embedding_dim=32, fea_dim=41, hidden_dim=64, out_dim=32, n_layers=n_layers,dropout=dropout).to(device)
     # model.apply(weight_init)
     params = sum([np.prod(p.size()) for p in model.parameters() if p.requires_grad])
@@ -531,7 +534,7 @@ if __name__=='__main__':
     max_patience = args.patience
 
     desc=['Project', 'Epoch', 'Acc', 'th','Rec/Sn', 'Pre', 'F1', 'Spe', 'MCC', 'AUROC', 'AUPRC', 'TN', 'FP', 'FN', 'TP']
-    for epoch in range(num_epochs):
+        for epoch in range(num_epochs):
         # Training
         start = time.perf_counter()
         train_step_loss, train_acc, train_loss, step = train_one_epoch(train_loader, model, device, optimizer, criterion)
@@ -539,30 +542,36 @@ if __name__=='__main__':
         end = time.perf_counter()
         print(f"Epoch {epoch+1} | {(end - start):.4f}s | Train | Loss: {train_loss: .6f}| Train acc: {train_acc:.4f}")
         start = time.perf_counter()
-        test_probs, test_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
+        valid_probs, valid_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
         end = time.perf_counter()
-        print(f"Epoch {epoch+1} | {(end - start):.4f}s | Test | Test loss: {valid_loss:.6f}| Test acc: {valid_acc:.4f}")
-        acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(test_probs, test_labels)
-        # pred_bi = np.abs(np.ceil(test_probs - th_))
-        # cm = confusion_matrix(test_labels, pred_bi)
-        # tn,fp,fn,tp = cm.ravel()
-        result_info = [project, epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
+        print(f"Epoch {epoch+1} | {(end - start):.4f}s | Valid | Valid loss: {valid_loss:.6f}| Valid acc: {valid_acc:.4f}")
+        acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(valid_probs, valid_labels)
+        result_info = [project+'_val', epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
         result_list.append(result_info)
         print_results(result_info, desc)
-        if auc_ < best_auc:
+        if valid_loss > last_loss+0.1:
             patience += 1
         if patience > max_patience:
             break
-        if auc_ >= best_auc:
+        if valid_loss <= last_loss:
+            last_loss = valid_loss
             best_auc = auc_
             best_acc = acc_
             best_epoch = epoch
+            if save_model:
+                save_path = osp.join(model_dir, f'best_{project}_model_epoch.pt')
+                torch.save(model.state_dict(), save_path)
+            start = time.perf_counter()
+            test_probs, test_labels, test_loss, test_acc = test_binary(model, test_loader, criterion, device)
+            end = time.perf_counter()
+            print(f"Epoch {epoch+1} | {(end - start):.4f}s | Test | Test loss: {test_loss:.6f}| Test acc: {test_acc:.4f}")
+            acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(test_probs, test_labels)
+            result_info = [project+'_test', epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
+            print_results(result_info, desc)
             best_test_probs = test_probs
             best_test_labels = test_labels
             best_result = result_info
-            if save_model:
-                save_path = osp.join(model_dir, f'best_{project}_model_epoch{epoch}.pt')
-                torch.save(model.state_dict(), save_path)
+    print('\nBest result:\n')
     print_results(best_result, desc)
     # Save training step loss
     loss_df = pd.DataFrame(all_train_loss_list)

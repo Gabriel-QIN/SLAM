@@ -213,14 +213,20 @@ if __name__=='__main__':
     pdb_dir = args.pdb_dir
 
     train_file = args.train
-    train_ds = SLAMDataset(train_file, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    train_list_all = [record for record in SeqIO.parse(train_file, "fasta")]
+    train_list, valid_list = random_split(train_list_all, 0.2, seed=SEED):
+    train_ds = SLAMDataset(train_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    valid_ds = SLAMDataset(valid_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    
     test_file = args.test
-    test_ds = SLAMDataset(test_file, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    test_list = [record for record in SeqIO.parse(test_file, "fasta")]
+    test_ds = SLAMDataset(test_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
     window_size = test_ds.win_size
-    print(f"Training dataset: {len(train_ds)}   |Testing dataset: {len(test_ds)}")
+    print(f"Training dataset: {len(train_ds)}   Valid dataset: {len(valid_ds)} |Testing dataset: {len(test_ds)}")
 
     train_loader = DataLoader(train_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
-    valid_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
+    valid_loader = DataLoader(valid_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
+    test_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
 
     model = SLAMNet(BERT_encoder=BERT_encoder, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,PLM_dim=PLM_dim,win_size=window_size,embedding_dim=embedding_dim, fea_dim=fea_dim, hidden_dim=hidden_dim, out_dim=out_dim,node_dim=node_dim, edge_dim=edge_dim, gnn_layers=gnn_layers,n_layers=n_layers,dropout=dropout).to(device)
     # model.apply(weight_init)
@@ -234,6 +240,7 @@ if __name__=='__main__':
     best_epoch = 0
     patience = 0
     max_patience = args.patience
+    last_loss = 100
     desc=['Project', 'Epoch', 'Acc', 'th','Rec/Sn', 'Pre', 'F1', 'Spe', 'MCC', 'AUROC', 'AUPRC', 'TN', 'FP', 'FN', 'TP']
 
     for epoch in range(num_epochs):
@@ -244,30 +251,35 @@ if __name__=='__main__':
         end = time.perf_counter()
         print(f"Epoch {epoch+1} | {(end - start):.4f}s | Train | Loss: {train_loss: .6f}| Train acc: {train_acc:.4f}")
         start = time.perf_counter()
-        test_probs, test_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
+        valid_probs, valid_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
         end = time.perf_counter()
-        print(f"Epoch {epoch+1} | {(end - start):.4f}s | Test | Test loss: {valid_loss:.6f}| Test acc: {valid_acc:.4f}")
-        acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(test_probs, test_labels)
-        # pred_bi = np.abs(np.ceil(test_probs - th_))
-        # cm = confusion_matrix(test_labels, pred_bi)
-        # tn,fp,fn,tp = cm.ravel()
-        result_info = [project, epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
+        print(f"Epoch {epoch+1} | {(end - start):.4f}s | Valid | Valid loss: {valid_loss:.6f}| Valid acc: {valid_acc:.4f}")
+        acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(valid_probs, valid_labels)
+        result_info = [project+'_val', epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
         result_list.append(result_info)
         print_results(result_info, desc)
-        if auc_ < best_auc:
+        if valid_loss > last_loss+0.1:
             patience += 1
         if patience > max_patience:
             break
-        if auc_ >= best_auc:
+        if valid_loss <= last_loss:
+            last_loss = valid_loss
             best_auc = auc_
             best_acc = acc_
             best_epoch = epoch
-            best_test_probs = test_probs
-            best_test_labels = test_labels
-            best_result = result_info
             if save_model:
                 save_path = osp.join(model_dir, f'best_{project}_model_epoch.pt')
                 torch.save(model.state_dict(), save_path)
+            start = time.perf_counter()
+            test_probs, test_labels, test_loss, test_acc = test_binary(model, test_loader, criterion, device)
+            end = time.perf_counter()
+            print(f"Epoch {epoch+1} | {(end - start):.4f}s | Test | Test loss: {test_loss:.6f}| Test acc: {test_acc:.4f}")
+            acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(test_probs, test_labels)
+            result_info = [project+'_test', epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
+            print_results(result_info, desc)
+            best_test_probs = test_probs
+            best_test_labels = test_labels
+            best_result = result_info
     print('\nBest result:\n')
     print_results(best_result, desc)
     # Save training step loss

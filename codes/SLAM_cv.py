@@ -863,7 +863,7 @@ def K_fold_split(datalist, ratio=0.2, k=5, seed=2024):
         test_set = datalist[start_idx:end_idx]
         train_set = datalist[:start_idx] + datalist[end_idx:]
         fold_list.append((train_set, test_set))
-        print(start_idx, end_idx)
+        # print(start_idx, end_idx)
     return fold_list
 
 if __name__=='__main__':

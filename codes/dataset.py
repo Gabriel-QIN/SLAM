@@ -21,6 +21,18 @@ atoms = ['N', 'CA', 'C', 'O', 'R', 'CB']
 n_atoms = len(atoms)
 atom_idx = {atom:atoms.index(atom) for atom in atoms}
 
+def random_split(datalist, ratio, seed=SEED):
+    """Randomly split dataset list into train and test."""
+    random.seed(seed)
+    random.shuffle(datalist)
+    # index_list = [i for i in range(num_samples)]
+    # random.shuffle(index_list)
+    num_samples = len(datalist)
+    split_num = int(num_samples * float(ratio))
+    large_list = datalist[split_num:]
+    small_list = datalist[:split_num]
+    return large_list, small_list
+
 def BLOSUM62(fastas, **kw):
     blosum62 = {
         'A': [4,  -1, -2, -2, 0,  -1, -1, 0, -2,  -1, -1, -1, -1, -2, -1, 1,  0,  -3, -2, 0],  # A
@@ -286,7 +298,7 @@ def get_graph_fea(pdb_path, pos, nneighbor=32, radius=10, atom_type='CA', cal_cb
     return Data(x=node, edge_index=edge_index, edge_attr=edge, name=os.path.basename(pdb_path).split('.')[0])
 
 class SLAMDataset(object):
-    def __init__(self, sample_file, tokenizer, pdb_dir=None, feature=None, nneighbor=32, atom_type='CA'):
+    def __init__(self, seqlist, tokenizer, pdb_dir=None, feature=None, nneighbor=32, atom_type='CA'):
         self.seq_list = []
         self.label_list = []
         self.feature_list = []
@@ -301,8 +313,6 @@ class SLAMDataset(object):
         self.feature = feature
         self.max_edge_num = 1000
         ind = 0
-        seqlist = [record for record in SeqIO.parse(sample_file, "fasta")]
-        
         for record in tqdm(seqlist):
             seq = str(record.seq)
             desc = record.id.split('|')
