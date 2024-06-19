@@ -110,17 +110,27 @@ After finishing the required installations,  you can quickly re-train our model 
    - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) : for structure-guided SLAM prediction
    - [SLAM_seq.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_seq.py) : for sequence-based prediction
    - [SLAM_cv.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py) : for cross-validation
+
 2. Datasets
 
    - Sequence datasets: 
      - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
      - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
    - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
+
 3. Models
 
    - Please download the pickled models from [SLAM server](https://ai4bio.online/SLAM/download/).
 
+3. Plotting
 
+   - [draw_figures.ipynb](https://github.com/Gabriel-QIN/SLAM/blob/master/Plots/draw_figures.ipynb)
+
+4. Case study
+
+   -  [case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/case study.ipynb)
+
+   
 
 ## Evaluation on species-specific datasets
 
@@ -167,6 +177,12 @@ python codes/SLAM_cv.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_pr
 | H. sapiens  |  0.772   | 0.808  |   0.756   |  0.780   |    0.735    | 0.546 | 0.842 | 0.833 |
 | M. musculus |  0.709   | 0.795  |   0.684   |  0.722   |    0.609    | 0.438 | 0.795 | 0.777 |
 |   U.viren   |  0.745   | 0.794  |   0.727   |  0.755   |    0.692    | 0.496 | 0.812 | 0.784 |
+
+
+
+## Reproducing artworks in SLAM paper
+
+Please kindly follow the instructions in the jupyter notebook: [Draw_figure](https://github.com/Gabriel-QIN/SLAM/tree/master/assets/Draw_figures.ipynb).
 
 
 
