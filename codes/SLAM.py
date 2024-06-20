@@ -189,7 +189,6 @@ if __name__=='__main__':
     encoder_list = args.encoder.split(',')
     n_layers = 1
     dropout = args.dropout
-    patience = args.patience
     if 'bert' in pretrained_model:
         PLM_dim = 1024
     elif 'esm' in pretrained_model:

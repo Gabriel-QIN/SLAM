@@ -891,7 +891,7 @@ if __name__=='__main__':
     encoder_list = args.encoder.split(',') # ['cnn','lstm','fea']
     n_layers = 1
     dropout = args.dropout
-    patience = args.patience
+    patience = num_epochs # do not use early stopping for cross-validation in case model cannot converge
     if 'bert' in pretrained_model:
         PLM_dim = 1024
     elif 'esm' in pretrained_model:
