@@ -90,6 +90,11 @@ pip install -r requirements.txt
 
 You can read more in [Virtualenv and pip Basics](http://jonathanchu.is/posts/virtualenv-and-pip-basics/), and the official [Requirements File Format](https://pip.pypa.io/en/stable/cli/pip_install/) documentation.
 
+### Protein language model
+
+Before running SLAM on your local machine, you need to prepare the pretrained protein language model ProtBert:
+Download the pretrained ProtBert model ( [link](https://huggingface.co/Rostlab/prot_bert) | [guide](https://github.com/agemagician/ProtTrans)).
+
 
 
 ## Getting started
@@ -110,23 +115,21 @@ After finishing the required installations,  you can quickly re-train our model 
    - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) : for structure-guided SLAM prediction
    - [SLAM_seq.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_seq.py) : for sequence-based prediction
    - [SLAM_cv.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py) : for cross-validation
-
 2. Datasets
 
    - Sequence datasets: 
      - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
      - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
    - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
-
 3. Models
 
    - Please download the pickled models from [SLAM server](https://ai4bio.online/SLAM/download/).
-
 4. Case study
 
    -  [case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/case study.ipynb)
 
-   
+
+
 
 ## Evaluation on species-specific datasets
 
