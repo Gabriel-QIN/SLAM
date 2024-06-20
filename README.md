@@ -122,10 +122,6 @@ After finishing the required installations,  you can quickly re-train our model 
 
    - Please download the pickled models from [SLAM server](https://ai4bio.online/SLAM/download/).
 
-3. Plotting
-
-   - [draw_figures.ipynb](https://github.com/Gabriel-QIN/SLAM/blob/master/Plots/draw_figures.ipynb)
-
 4. Case study
 
    -  [case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/case study.ipynb)
@@ -177,12 +173,6 @@ python codes/SLAM_cv.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_pr
 | H. sapiens  |  0.772   | 0.808  |   0.756   |  0.780   |    0.735    | 0.546 | 0.842 | 0.833 |
 | M. musculus |  0.709   | 0.795  |   0.684   |  0.722   |    0.609    | 0.438 | 0.795 | 0.777 |
 |   U.viren   |  0.745   | 0.794  |   0.727   |  0.755   |    0.692    | 0.496 | 0.812 | 0.784 |
-
-
-
-## Reproducing artworks in SLAM paper
-
-Please kindly follow the instructions in the jupyter notebook: [Draw_figure](https://github.com/Gabriel-QIN/SLAM/tree/master/assets/Draw_figures.ipynb).
 
 
 
