@@ -948,6 +948,7 @@ if __name__=='__main__':
         result_list = []
         all_train_loss_list = []
         best_auc = 0
+        best_loss = 100
         best_epoch = 0
         patience = 0
         max_patience = args.patience
@@ -960,29 +961,27 @@ if __name__=='__main__':
             end = time.perf_counter()
             print(f"Fold {fold} | Epoch {epoch+1} | {(end - start):.4f}s | Train | Loss: {train_loss: .6f}| Train acc: {train_acc:.4f}")
             start = time.perf_counter()
-            test_probs, test_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
+            valid_probs, valid_labels, valid_loss, valid_acc = test_binary(model, valid_loader, criterion, device)
             end = time.perf_counter()
             print(f"Fold {fold} | Epoch {epoch+1} | {(end - start):.4f}s | Test | Test loss: {valid_loss:.6f}| Test acc: {valid_acc:.4f}")
-            acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(test_probs, test_labels)
-            # pred_bi = np.abs(np.ceil(test_probs - th_))
-            # cm = confusion_matrix(test_labels, pred_bi)
-            # tn,fp,fn,tp = cm.ravel()
+            acc_, th_, rec_, pre_, f1_, spe_, mcc_, auc_, pred_class, auprc_, tn, fp, fn, tp = eval_metrics(valid_probs, valid_labels)
             result_info = [fold, epoch, (tn+tp)/(tn+tp+fp+fn), th_, rec_, pre_, f1_, spe_, mcc_, auc_, auprc_, tn, fp, fn, tp]
             result_list.append(result_info)
             print_results(result_info, desc)
-            if auc_ < best_auc:
+            if best_loss < valid_loss:
                 patience += 1
             if patience > max_patience:
                 break
-            if auc_ >= best_auc:
+            if best_loss < valid_loss:
+                best_loss = valid_loss
                 best_auc = auc_
                 best_acc = acc_
                 best_epoch = epoch
-                best_test_probs = test_probs
-                best_test_labels = test_labels
+                best_test_probs = valid_probs
+                best_test_labels = valid_labels
                 best_result = result_info
                 if save_model:
-                    save_path = osp.join(model_dir, f'best_{project}_model_epoch.pt')
+                    save_path = osp.join(model_dir, f'best_{project}_model_epoch_fold_{fold}.pt')
                     torch.save(model.state_dict(), save_path)
         print(f'\n Fold {fold} best result:\n')
         print_results(best_result, desc)
