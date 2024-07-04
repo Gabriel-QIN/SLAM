@@ -1,4 +1,4 @@
-<div style="display: flex; align-items: center; justify-content: center;">   <img src="assets/logo.png" alt="Logo" width="50" height="50" style="margin-right: 10px;">   <h1>SLAM</h1> </div>
+<table>   <tr>     <td style="text-align: center;">       <img src="assets/logo.png" alt="Logo" width="50" height="50">     </td>     <td style="text-align: center;">       <h1>SLAM</h1>     </td>   </tr> </table>
 
 
 
