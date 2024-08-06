@@ -80,7 +80,10 @@ def _get_encoding(seq, feature=[BLOSUM62, BINA]):
     return np.hstack(all_fea)
     
 def get_all_inputs(seq, pos, tokenizer, pdb_path):
-    data = get_graph_fea_chain(pdb_path, pos, nneighbor=32, atom_type='CA', cal_cb=True)
+    if pdb_path is not None:
+        data = get_graph_fea_chain(pdb_path, pos, nneighbor=64, atom_type='CA', cal_cb=True)
+    else:
+        data = None
     fea = _get_encoding(seq)
     s = ''.join([token for token in re.sub(r"[UZOB*]", "X", seq.rstrip('*'))])
     max_len = len(s)
@@ -132,13 +135,13 @@ def get_all_k(seqlist, window_size=51):
                 peplist.append([f'{name}|Pred|{pos}|{len(seq)}', pep])
     return peplist
 
-def predict_engine(seq_path, pdb_path, threshold=0.4, species='general', chain='A', use_PLM=False):
+def predict_engine(seq_path, pdb_path, threshold=0.06, species='general', chain='A', use_PLM=False):
     if pdb_path is not None and use_PLM: # Use PLM+GNN
         para = HyperParam_SLAM
     else:
-        if pdb_path is None and use_PLM: # Only use PLM
-            para = HyperParam_struct
-        else:
+        if pdb_path is None: # Only use PLM
+        #     para = HyperParam_struct
+        # else:
             para = HyperParam_seq # Not use PLM and GNN
     gpu = para.gpu
     # device = torch.device(f'cuda:{gpu}' if torch.cuda.is_available() else 'cpu')
@@ -164,15 +167,19 @@ def predict_engine(seq_path, pdb_path, threshold=0.4, species='general', chain='
         BERT_encoder = AutoModel.from_pretrained(pretrained_model, local_files_only=True, output_attentions=False).to(device)
     else:
         BERT_encoder = None
-    model_file = osp.join(para.model_dir, f'{species}_model.pt')
-    if para.model_dir.split('/')[-1] in ['SLAM', 'SLAM_wo_plm_and_structure']:
+    if para.model_dir.split('/')[-1] in ['SLAM']:
+        model_file = osp.join(para.model_dir, f'{species}_model.pt')
         model = SLAMNet(BERT_encoder=BERT_encoder, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,PLM_dim=PLM_dim,win_size=window_size,embedding_dim=embedding_dim, fea_dim=fea_dim, hidden_dim=hidden_dim, out_dim=out_dim,node_dim=node_dim, edge_dim=edge_dim, gnn_layers=gnn_layers,n_layers=n_layers,dropout=dropout).to(device)
         model.load_state_dict(torch.load(model_file, map_location=device))
-    else:
-        model = SLAMNetSeq(BERT_encoder=None, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,win_size=window_size,embedding_dim=32, fea_dim=41, hidden_dim=64, out_dim=32, n_layers=n_layers,dropout=dropout).to(device)
+    else: # 'SLAM_wo_plm_and_structure'
+        model_file = osp.join(para.model_dir, f'{species}_seq_model.pt')
+        model = SLAMNetSeq(BERT_encoder=None, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,win_size=window_size,embedding_dim=32, fea_dim=41, hidden_dim=64, out_dim=32, n_layers=n_layers,dropout=dropout, kernel_size=3).to(device)
         model.load_state_dict(torch.load(model_file, map_location=device))
-    first_aa_position = int(parse_pdb_chain(pdb_path, chain=chain,pos=None, atom_type=atom_type, nneighbor=nneighbor, cal_cb=True)[-1])
-    discrepancy = first_aa_position - 1
+    if pdb_path is not None:
+        first_aa_position = int(parse_pdb_chain(pdb_path, chain=chain,pos=None, atom_type=atom_type, nneighbor=nneighbor, cal_cb=True)[-1])
+        discrepancy = first_aa_position - 1
+    else:
+        discrepancy = 0
     seqlist = [record for record in SeqIO.parse(seq_path, "fasta")]
     peplist = get_all_k(seqlist, window_size=window_size)
 
@@ -184,20 +191,26 @@ def predict_engine(seq_path, pdb_path, threshold=0.4, species='general', chain='
         pos = int(tmp[2])
         g, input_ids, attention_mask, feature = get_all_inputs(seq,pos,tokenizer,pdb_path)
         feature = feature.unsqueeze(0).to(device)
-        g = g.to(device)
-        g.batch = torch.zeros(g.x.shape[0],dtype=torch.int64).to(device)
+        if g is not None:
+            g = g.to(device)
+            g.batch = torch.zeros(g.x.shape[0],dtype=torch.int64).to(device)
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        pred = model(input_ids=input_ids, attention_mask=attention_mask, feature=feature, g_data=g)
+        if pdb_path is not None:
+            pred = model(input_ids=input_ids, attention_mask=attention_mask, feature=feature, g_data=g)
+        else:
+            pred = model(input_ids=input_ids, attention_mask=attention_mask, feature=feature)
         score = pred.squeeze().detach().item()
-        if score > 0.8:
+        if score > 0.24:
+            confidence = 'Extremely high'
+        elif 0.15 < score <= 0.24:
             confidence = 'High'
-        elif 0.5 < score < 0.8:
+        elif 0.09 <= score < 0.15:
             confidence = 'Medium'
-        elif threshold < score < 0.5:
+        elif threshold < score < 0.06:
             confidence = 'Low'
         else:
-            confidence = 'Extremely low'
+            confidence = 'Non-Kbhb'
         prediction = 'Yes' if score > threshold else 'No'
         seq = seq[20:31]
         result = [tmp[0], seq, pos+discrepancy, score, prediction, confidence]
@@ -209,94 +222,107 @@ def predict_engine(seq_path, pdb_path, threshold=0.4, species='general', chain='
     kbhb = case[case['Score']>threshold]
     return case, kbhb
 
-def draw_scatter_ptm(case, savename='scatter.png', threshold=0.4):
-    x_min = case['Position'].min()
-    x_max = case['Position'].max()
-    x_range = x_max - x_min
-    fig_width = max(10, x_range / 10)
-    fig_height = 6
+def draw_scatter_ptm(case, savename='scatter.png', threshold=0.06):
+    x_max = len(case['Position'])
+    x_range = x_max - 0
+    fig_width = max(10, (x_range / 10)*2)
+    fig_height = 6 
     plt.figure(figsize=(fig_width, fig_height))
     palette = []
     for score in case['Score']:
-        if score >0.8:
-            palette.append('red')
-        elif 0.5 <= score <= 0.8:
-            palette.append('orange')
-        elif threshold <= score < 0.5:
-            palette.append('pink')
+        if score > 0.24:
+            palette.append('#FA7070')
+        elif 0.15 < score <= 0.24:
+            palette.append('#F3CCF3')
+        elif 0.09 <= score <= 0.15:
+            palette.append('#F8F9D7')
+        elif threshold <= score < 0.09:
+            palette.append('#D2DAFF')
         else:
-            palette.append('#E5E1DA')
+            palette.append('#EEEEEE')
 
     plt.scatter(x=case['Position'], y=case['Score'], s=100, c=palette, edgecolor='grey', linewidth=1.5)
     plt.axhline(y=threshold, color='#B06161', linestyle='--')  
     plt.xlabel('Position', fontsize=14, labelpad=10)
     plt.ylabel('Score', fontsize=14, labelpad=10)
 
-    handles = [plt.Line2D([0], [0], color='red', lw=4, label='High confidence'),
-        plt.Line2D([0], [0], color='orange', lw=4, label='Medium confidence'),
-        plt.Line2D([0], [0], color='pink', lw=4, label='Low confidence'),
-        plt.Line2D([0], [0], color='#E5E1DA', lw=4, label='Extremely low confidence')]
+    handles = [plt.Line2D([0], [0], color='#FA7070', lw=4, label='Extremely high (Sp = 0.95)'),
+            plt.Line2D([0], [0], color='#F3CCF3', lw=4, label='High (Sp = 0.9)'),
+            plt.Line2D([0], [0], color='#F8F9D7', lw=4, label='Medium (Sp = 0.85)'),
+            plt.Line2D([0], [0], color='#D2DAFF', lw=4, label='Low (Sp = 0.8)'),
+            plt.Line2D([0], [0], color='#EEEEEE', lw=4, label='Non-Kbhb')]
     plt.legend(handles=handles)
     plt.savefig(savename,dpi=600)
 
+def draw_pie_chart_ptm(case, savename='pie_chart.png', threshold=0.06):
+    extremely_high_confidence = sum(1 for score in case['Score'] if score > 0.24) # Sp 0.95
+    high_confidence = sum(1 for score in case['Score'] if 0.15 < score <= 0.24) # Sp 0.9
+    medium_confidence = sum(1 for score in case['Score'] if 0.09 < score <= 0.15) # Sp from 0.8 to 0.9
+    low_confidence = sum(1 for score in case['Score'] if threshold < score <= 0.09) # Sp 0.7
+    extremely_low_confidence = sum(1 for score in case['Score'] if score < threshold)
+
+    sizes = [extremely_high_confidence, high_confidence, medium_confidence, low_confidence, extremely_low_confidence]
+    # ind = [ind for ind,s in enumerate(sizes) if s > 0]
+    colors = ['#FA7070', '#F3CCF3', '#F8F9D7', '#D2DAFF', '#EEEEEE']
+    plt.figure()
+    wedges, texts, autotexts = plt.pie(
+        sizes, colors=colors, autopct='%1.1f%%', startangle=0, wedgeprops=dict(edgecolor='grey'))
+
+    handles = [
+        plt.Line2D([0], [0], color='#FA7070', lw=4, label='Extremely high (Sp = 0.95)'),
+        plt.Line2D([0], [0], color='#F3CCF3', lw=4, label='High (Sp = 0.9)'),
+        plt.Line2D([0], [0], color='#F8F9D7', lw=4, label='Medium (Sp = 0.85)'),
+        plt.Line2D([0], [0], color='#D2DAFF', lw=4, label='Low (Sp = 0.8)'),
+        plt.Line2D([0], [0], color='#EEEEEE', lw=4, label='Non-Kbhb')
+    ]
+
+    plt.legend(handles=handles, loc='lower left', bbox_to_anchor=(0.01, 0.01), framealpha=1, facecolor='white', title_fontsize='10', fontsize='8')
+
+    plt.tight_layout()
+    plt.savefig(savename, dpi=600)
+
 def draw_ptm(kbhb, savename='kbhb.png', threshold=0.4):
-    x_min = kbhb['Position'].min()
-    x_max = kbhb['Position'].max()
+    x_max = len(kbhb['Position'])
     
-    x_range = x_max - x_min
-    fig_width = max(10, x_range / 10) 
+    fig_width = 10
     fig_height = 6 
     plt.figure(figsize=(fig_width, fig_height))
     palette = []
     for score in kbhb['Score']:
-        if score >0.8:
-            palette.append('#FFC0D9')
-        elif 0.5 <= score <= 0.8:
-            palette.append('#FFD0D0')
-        elif threshold <= score < 0.5:
-            palette.append('#DFCCFB')
+        if score > 0.24:
+            palette.append('#FA7070')
+        elif 0.15 < score <= 0.24:
+            palette.append('#F3CCF3')
+        elif 0.09 <= score <= 0.15:
+            palette.append('#F8F9D7')
+        elif threshold <= score < 0.09:
+            palette.append('#D2DAFF')
         else:
-            palette.append('#E5E1DA')
+            palette.append('#EEEEEE')
     sns.barplot(x='Position', y='Score', data=kbhb, palette=palette,edgecolor='black', linewidth=1.5) # , width=0.5
     plt.axhline(y=threshold, color='#B06161', linestyle='--')
     plt.xlabel('Position',fontsize=14,labelpad=10)
     plt.ylabel('Score',fontsize=14,labelpad=10)
-    handles = [plt.Line2D([0], [0], color='#FFC0D9', lw=4, label='High confidence'),
-            plt.Line2D([0], [0], color='#FFD0D0', lw=4, label='Medium confidence'),
-            plt.Line2D([0], [0], color='#DFCCFB', lw=4, label='Low confidence'),
-            plt.Line2D([0], [0], color='#E5E1DA', lw=4, label='Extremely low confidence')]
+    handles = [plt.Line2D([0], [0], color='#FA7070', lw=4, label='Extremely high (Sp = 0.95)'),
+            plt.Line2D([0], [0], color='#F3CCF3', lw=4, label='High (Sp = 0.9)'),
+            plt.Line2D([0], [0], color='#F8F9D7', lw=4, label='Medium (Sp = 0.85)'),
+            plt.Line2D([0], [0], color='#D2DAFF', lw=4, label='Low (Sp = 0.8)'),
+            plt.Line2D([0], [0], color='#EEEEEE', lw=4, label='Non-Kbhb')]
     plt.legend(handles=handles)
     plt.tight_layout()
     plt.xticks(rotation=45, ha='right')
     plt.savefig(savename,dpi=600)
 
-def draw_pie_chart_ptm(case, savename='pie_chart.png', threshold=0.4):
-    high_confidence = sum(1 for score in case['Score'] if score > 0.8)
-    medium_confidence = sum(1 for score in case['Score'] if 0.5 <= score <= 0.8)
-    low_confidence = sum(1 for score in case['Score'] if threshold <= score < 0.5)
-    extremely_low_confidence = sum(1 for score in case['Score'] if score < threshold)
-
-    sizes = [high_confidence, medium_confidence, low_confidence, extremely_low_confidence]
-    labels = ['High confidence', 'Medium confidence', 'Low confidence', 'Extremely low confidence']
-    colors = ['red', 'orange', 'pink', '#E5E1DA']
-
-    plt.figure()
-    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=0, wedgeprops=dict(edgecolor='grey'))
-
-    plt.savefig(savename, dpi=600)
-
 if __name__=='__main__':
     chain = 'A'
     pdb_path = f'../case_study/5w49.pdb'
+    pdb_path = None
     seq_path = f'../case_study/5w49.fa'
     species = 'general'
     use_PLM = True
-    threshold = 0.4
-    if threshold > 0.4:
-        threshold = 0.4
+    threshold = 0.06
     case, kbhb = predict_engine(seq_path, pdb_path, threshold=threshold, species=species, chain=chain, use_PLM=use_PLM)
     print(case)
     draw_ptm(kbhb, savename='../case_study/bar.png', threshold=threshold)
-    draw_scatter_ptm(case, savename='../case_study/scatter.png', threshold=threshold)
     draw_scatter_ptm(case, savename='../case_study/scatter.png', threshold=threshold)
     draw_pie_chart_ptm(case, savename='../case_study/pie_chart.png', threshold=threshold)
