@@ -113,11 +113,12 @@ After finishing the required installations,  you can quickly re-train our model 
    - [model.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/model.py) : PyTorch-version SLAM model
    - [metrics.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/metrics.py) : validation metrics and additional utils
    - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) : for structure-guided SLAM training
+   - [predict.py]([SLAM/codes/predict.py at master · Gabriel-QIN/SLAM (github.com)](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/predict.py)): for predicting Kbhb with/without structures
+   - [hypara.py]([SLAM/codes/hypara.py at master · Gabriel-QIN/SLAM (github.com)](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/hypara.py)): SLAM model hyperparameter
 2. Datasets
 
    - Sequence datasets: 
-     - 1) [general_train.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_train.fa) and [general_test.fa](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets/general_test.fa) for general species predictions; 
-     - 2) [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
+     - [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
    - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
 3. Models
 
@@ -139,49 +140,43 @@ For more information, please refer to the source code for [SLAM](https://github.
 dataset=Datasets
 sp=general
 gpu=0
-python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train.fa --test Datasets/${sp}_test.fa --gpu ${gpu} --seed 2024
+python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train_ratio_all.fa --test Datasets/${sp}_test_ratio_all.fa --gpu ${gpu} --seed 2024
 ```
 
-![species-specific results](./assets/species_specific.png)
+![species-specific results](./assets/AUROC.png)
 
 
 
 |    Species    | Accuracy | Recall | Precision | F1-score | Specificity |  MCC  |  AUC  | AUPRC |
 | :-----------: | :------: | :----: | :-------: | :------: | :---------: | :---: | :---: | :---: |
-|    General    |  0.799   | 0.803  |   0.796   |  0.800   |    0.795    | 0.598 | 0.876 | 0.849 |
-| *H. sapiens*  |  0.796   | 0.787  |   0.802   |  0.794   |    0.806    | 0.592 | 0.873 | 0.861 |
-| *M. musculus* |  0.778   | 0.862  |   0.738   |  0.795   |    0.694    | 0.565 | 0.856 | 0.828 |
-|   *U.viren*   |  0.816   | 0.904  |   0.768   |  0.831   |    0.728    | 0.642 | 0.884 | 0.865 |
+|    General    |  0.892   | 0.609  |   0.337   |  0.434   |    0.913    | 0.400 | 0.890 | 0.369 |
+| *H. sapiens*  |  0.938   | 0.469  |   0.374   |  0.416   |    0.961    | 0.386 | 0.899 | 0.355 |
+| *M. musculus* |  0.901   | 0.679  |   0.583   |  0.627   |    0.932    | 0.572 | 0.907 | 0.595 |
+|  *U. viren*   |  0.898   | 0.702  |   0.455   |  0.552   |    0.917    | 0.513 | 0.923 | 0.561 |
 
 
 
-### 2. Evaluation using 5-fold cross-validation
-
-For more information, please refer to the code for [5-fold cross-validation](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM_cv.py).
+### 2. Comparison with other machine learning algorithms
 
 ```sh
-dataset=Datasets
-sp=general
-gpu=0
-python codes/SLAM_cv.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train.fa --test Datasets/${sp}_test.fa --gpu ${gpu} --seed 2024
+cd Plots
+python plot.py
 ```
 
-
-
-|   Species   | Accuracy | Recall | Precision | F1-score | Specificity |  MCC  |  AUC  | AUPRC |
-| :---------: | :------: | :----: | :-------: | :------: | :---------: | :---: | :---: | :---: |
-|   General   |  0.777   | 0.845  |   0.744   |  0.790   |    0.706    | 0.559 | 0.850 | 0.831 |
-| H. sapiens  |  0.772   | 0.808  |   0.756   |  0.780   |    0.735    | 0.546 | 0.842 | 0.833 |
-| M. musculus |  0.709   | 0.795  |   0.684   |  0.722   |    0.609    | 0.438 | 0.795 | 0.777 |
-|   U.viren   |  0.745   | 0.794  |   0.727   |  0.755   |    0.692    | 0.496 | 0.812 | 0.784 |
+![species-specific results](./Plots/logits/AUROC.png)
 
 
 
 ## Case study on AHCY
 
+```sh
+cd codes
+python predict.py
+```
+
 AHCY, short for S-adenosyl-L-homocysteine hydrolase, is the only enzyme that can hydrolyze SAH in mammalian[1]. In human cells, it is reported that the loss of AHCY is a causal factor for embryonic lethality[2], and the deficiency can lead to numerous diseases, including neurological disorders, cancer (e.g., hepatocellular carcinoma), early childhood death, and myopathy[3].  Despite the functional investigation of AHCY by previous experimental studies, its regulation remains largely underexplored. Previous studies had already confirmed that AHCY is a bona fide target of Kbhb which could potentially exerts impact on the enzymatic activity[4]. They found that the AHCY activity was attenuated after an 8h treatment of 10mM Na-β-OHB treatment[4]. 
 
-Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23526)) and NAD+-bound structure ([PDB: 5W49](https://www.rcsb.org/structure/5W49)), we further predicted 6 potential β-hydroxybutyrylated sites including K8, K186, K214, K226, K401 and K408 . The SLAM model is capable of predicting all six experimentally-verified Kbhb sites. K188 is predicted with a relatively high score (i.e., 0.842), while K380 and K405 are predicted with a medium score (i.e., 0.5~0.8), and K20, K43 and K204 merely pass the defined threshold (i.e., 0.4). For making predictions with your own case, please carefully follow the instructions in the jupyter notebook: `Case_study.ipynb`, and replace files with your sequence and structure.
+Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23526)) and NAD+-bound structure ([PDB: 5W49](https://www.rcsb.org/structure/5W49)), the SLAM model is capable of predicting all six experimentally-verified Kbhb sites. K43, K188, K204, K389 and K405 are predicted with a high score (Sp = 90%), while K20 is predicted with a medium score (Sp = 85%). We further predicted 6potential β-hydroxybutyrylated sites including K46, K226, K318, K322, K388, K401 and K408. For making predictions with your own case, please carefully follow the instructions in the jupyter notebook: `Case_study.ipynb`, and replace files with your sequence and structure.
 
 ![Fig9](assets/case_study.png)
 
