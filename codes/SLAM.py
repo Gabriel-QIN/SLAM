@@ -211,21 +211,21 @@ if __name__=='__main__':
     gnn_layers = args.gnn_layers
     pdb_dir = args.pdb_dir
     window_size = 51
-    # train_file = args.train
-    # train_list_all = [record for record in SeqIO.parse(train_file, "fasta")]
-    # train_list, valid_list = random_split(train_list_all, 0.2, seed=SEED)
-    # train_ds = SLAMDataset(train_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
-    # valid_ds = SLAMDataset(valid_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    train_file = args.train
+    train_list_all = [record for record in SeqIO.parse(train_file, "fasta")]
+    train_list, valid_list = random_split(train_list_all, 0.2, seed=SEED)
+    train_ds = SLAMDataset(train_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    valid_ds = SLAMDataset(valid_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
     
-    # test_file = args.test
-    # test_list = [record for record in SeqIO.parse(test_file, "fasta")]
-    # test_ds = SLAMDataset(test_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
-    # window_size = test_ds.win_size
-    # print(f"Training dataset: {len(train_ds)}   Valid dataset: {len(valid_ds)} |Testing dataset: {len(test_ds)}")
+    test_file = args.test
+    test_list = [record for record in SeqIO.parse(test_file, "fasta")]
+    test_ds = SLAMDataset(test_list, tokenizer, pdb_dir=pdb_dir, feature=manual_fea, nneighbor=nneighbor, atom_type=atom_type)
+    window_size = test_ds.win_size
+    print(f"Training dataset: {len(train_ds)}   Valid dataset: {len(valid_ds)} |Testing dataset: {len(test_ds)}")
 
-    # train_loader = DataLoader(train_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
-    # valid_loader = DataLoader(valid_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
-    # test_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
+    train_loader = DataLoader(train_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
+    valid_loader = DataLoader(valid_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
+    test_loader = DataLoader(test_ds,batch_size=batch_size,shuffle=True,num_workers=cpu, collate_fn=graph_collate_fn, prefetch_factor=2)
 
     model = SLAMNet(BERT_encoder=BERT_encoder, vocab_size=tokenizer.vocab_size, encoder_list=encoder_list,PLM_dim=PLM_dim,win_size=window_size,embedding_dim=embedding_dim, fea_dim=fea_dim, hidden_dim=hidden_dim, out_dim=out_dim,node_dim=node_dim, edge_dim=edge_dim, gnn_layers=gnn_layers,n_layers=n_layers,dropout=dropout).to(device)
     # model.apply(weight_init)
