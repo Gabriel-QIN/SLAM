@@ -299,21 +299,21 @@ class SLAMNet(nn.Module):
             self.cnn_encoder = CNNEncoder(vocab_size, embed_dim=embedding_dim, hidden_dim=hidden_dim, win_size=win_size, out_dim=out_dim, dropout=dropout)
             dim_list.append(out_dim)
         if 'plm' in self.encoder_list:
-            self.plm_encoder = PLMEncoder(BERT_encoder=BERT_encoder, out_dim=16, PLM_dim=PLM_dim, dropout=dropout)
-            dim_list.append(16)
+            self.plm_encoder = PLMEncoder(BERT_encoder=BERT_encoder, out_dim=out_dim, PLM_dim=PLM_dim, dropout=dropout)
+            dim_list.append(out_dim)
         if 'lstm' in self.encoder_list:
-            self.lstm_encoder = BiLSTMEncoder(vocab_size=vocab_size, embedding_dim=embedding_dim, hidden_dim=hidden_dim, out_dim=out_dim, n_layers=n_layers, dropout=dropout, bidirectional=bidirectional)
             if bidirectional:
-                dim_list.append(out_dim*2)
+                lstm_dim = out_dim // 2
             else:
-                dim_list.append(out_dim)
+                lstm_dim = out_dim
+            self.lstm_encoder = BiLSTMEncoder(vocab_size=vocab_size, embedding_dim=embedding_dim, hidden_dim=hidden_dim, out_dim=lstm_dim, n_layers=n_layers, dropout=dropout, bidirectional=bidirectional)
+            dim_list.append(lstm_dim)
         if 'fea' in self.encoder_list:
             self.fea_encoder = FeatureEncoder(input_dim=fea_dim, hidden_dim=hidden_dim, out_dim=out_dim, win_size=win_size, dropout=dropout)
             dim_list.append(out_dim)
         if 'gnn' in self.encoder_list:
-            self.gnn_encoder = GraphEncoder(node_in_dim=node_dim, edge_in_dim=edge_dim, hidden_dim=16, num_layers=gnn_layers, dropout=0.9)
-            gnn_dim = hidden_dim
-            dim_list.append(16)
+            self.gnn_encoder = GraphEncoder(node_in_dim=node_dim, edge_in_dim=edge_dim, hidden_dim=out_dim, num_layers=gnn_layers, dropout=dropout)
+            dim_list.append(out_dim)
         for name, p in self.named_parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
