@@ -196,18 +196,27 @@ Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23
 
 If you find SLAM helpful in your study, please kindly cite the following paper:
 
-*[APA format]*
+*[APA]*
+
+Qin, Z., Liu, H., Zhao, P., Wang, K., Ren, H., Miao, C., … Chen, Z. (2024). SLAM: Structure-aware lysine β-hydroxybutyrylation prediction with protein language model. International Journal of Biological Macromolecules, 280, 135741. doi:10.1016/j.ijbiomac.2024.135741
 
 or
 
 BibTeX entry:
 
 ```bibtex
-@article{SLAM,
-    title={SLAM: structure-aware lysine beta-hydroxybutyrylation prediction with protein language model},
-    author={Zhao-hui Qin, Zhen Chen},
-    journal={bioRxiv},
-    year={2024}
+@article{QIN2024135741,
+title = {SLAM: Structure-aware lysine β-hydroxybutyrylation prediction with protein language model},
+journal = {International Journal of Biological Macromolecules},
+volume = {280},
+pages = {135741},
+year = {2024},
+issn = {0141-8130},
+doi = {https://doi.org/10.1016/j.ijbiomac.2024.135741},
+url = {https://www.sciencedirect.com/science/article/pii/S0141813024065498},
+author = {Zhaohui Qin and Huixia Liu and Pei Zhao and Kaiyuan Wang and Haoran Ren and Chunbo Miao and Junzhou Li and Yong-Zi Chen and Zhen Chen},
+keywords = {Lysine β-hydroxybutyrylation, Graph neural network, Protein language model},
+abstract = {Post-translational modifications (PTMs) diversify protein functions by adding/removing chemical groups to certain amino acid. As a newly-reported PTM, lysine β-hydroxybutyrylation (Kbhb) presents a new avenue to functional proteomics. Therefore, accurate and efficient prediction of Kbhb sites is imperative. However, the current experimental methods for identifying PTM sites are often expensive and time-consuming. Up to now, there is no computational method proposed for Kbhb sites detection. To this end, we present the first deep learning-based method, termed SLAM, to in silico identify lysine β-hydroxybutyrylation sites. The performance of SLAM is evaluated on both 5-fold cross-validation and independent test, achieving 0.890, 0.899, 0.907 and 0.923 in terms of AUROC values, on the general and species-specific independent test sets, respectively. As one example, we predicted the potential Kbhb sites in human S-adenosyl-L-homocysteine hydrolase, which is in agreement with experimentally-verified Kbhb sites. In summary, our method could enable accurate and efficient characterization of novel Kbhb sites that are crucial for the function and stability of proteins and could be applied in the structure-guided identification of other important PTM sites. The SLAM online service and source code is available at https://ai4bio.online/SLAM and https://github.com/Gabriel-QIN/SLAM, respectively.}
 }
 ```
 
