@@ -1,7 +1,7 @@
 # <img src="assets/logo.png" alt="Logo" width="40" height="40"> SLAM 
 
 
->This is a repository containing source code for paper title "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
+>This is a repository containing source code for paper titled "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
 
 
 
@@ -194,7 +194,7 @@ Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23
 
 # Citation
 
-If you find SLAM helpful in your study, please kindly cite the following paper:
+If you find SLAM helpful in your study, please kindly cite the following [paper ](https://authors.elsevier.com/a/1joB7WFfgx8VQ):
 
 *[APA]*
 
