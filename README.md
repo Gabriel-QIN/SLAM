@@ -1,4 +1,4 @@
-# `<img src="assets/logo.png" alt="Logo" width="40" height="40">` SLAM
+# SLAM
 
 > This is a repository containing source code for paper titled "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
 
