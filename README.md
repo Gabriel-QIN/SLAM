@@ -1,9 +1,6 @@
-# <img src="assets/logo.png" alt="Logo" width="40" height="40"> SLAM 
+# `<img src="assets/logo.png" alt="Logo" width="40" height="40">` SLAM
 
-
->This is a repository containing source code for paper titled "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
-
-
+> This is a repository containing source code for paper titled "SLAM: structure-aware lysine β-hydroxybutyrylation prediction with protein language model".
 
 # Introduction
 
@@ -11,13 +8,11 @@ Post-translational modifications (PTMs) in proteins expand the functional divers
 
 ![SLAM overall framework](./assets/SLAM_framework.png)
 
-
-
 # SLAM method
 
 ## Model architecture
 
-Here, we present a hybrid deep learning neural Networks combining Structure and LAnguage-Model constraints (SLAM), for species-specific and general protein lysine β-hydroxybutyrylation site prediction. The developed geometric deep learning framework includes 1) a multi-track encoder module to concurrently embed the protein structure and sequence features into a latent representation; 2) a decoder layer consisting of an attention layer and a multi-layer perceptron followed with a sigmoid function for downstream classification. The sequence encoder is designed as hybrid deep learning neural networks to learn dependencies between residues with two-track feature encoders and two-track adaptive encoders. Adaptive encoders enable learn-from-data for SLAM by using learnable word embeddings, and feature encoders provide expert-level information and evolutionary constraints extracted from protein language model. For structure encoder, a multi-layer graph neural network (GNN) is implemented to capture high-level residue relationships considering geometry. 
+Here, we present a hybrid deep learning neural Networks combining Structure and LAnguage-Model constraints (SLAM), for species-specific and general protein lysine β-hydroxybutyrylation site prediction. The developed geometric deep learning framework includes 1) a multi-track encoder module to concurrently embed the protein structure and sequence features into a latent representation; 2) a decoder layer consisting of an attention layer and a multi-layer perceptron followed with a sigmoid function for downstream classification. The sequence encoder is designed as hybrid deep learning neural networks to learn dependencies between residues with two-track feature encoders and two-track adaptive encoders. Adaptive encoders enable learn-from-data for SLAM by using learnable word embeddings, and feature encoders provide expert-level information and evolutionary constraints extracted from protein language model. For structure encoder, a multi-layer graph neural network (GNN) is implemented to capture high-level residue relationships considering geometry.
 
 ![method](./assets/method.png)
 
@@ -33,7 +28,7 @@ Several common packages are used in this project.
 
 Using the following commands to create your own conda environment:
 
-First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) or [Miniconda](https://docs.anaconda.com/free/miniconda/) installed in your machine  using command `which conda` (for Linux).
+First make sure you have [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html) or [miniconda](https://docs.anaconda.com/free/miniconda/) installed in your machine  using command `which conda` (for Linux).
 
 ### Step1
 
@@ -95,13 +90,9 @@ You can read more in [Virtualenv and pip Basics](http://jonathanchu.is/posts/vir
 Before running SLAM on your local machine, you need to prepare the pretrained protein language model ProtBert:
 Download the pretrained ProtBert model ( [link](https://huggingface.co/Rostlab/prot_bert) | [guide](https://github.com/agemagician/ProtTrans)).
 
-
-
 ## Getting started
 
 After finishing the required installations,  you can quickly re-train our model or predict your own data in a high-throughput manner.
-
-
 
 # Reproducing the SLAM method
 
@@ -113,22 +104,19 @@ After finishing the required installations,  you can quickly re-train our model 
    - [model.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/model.py) : PyTorch-version SLAM model
    - [metrics.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/metrics.py) : validation metrics and additional utils
    - [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) : for structure-guided SLAM training
-   - [predict.py]([SLAM/codes/predict.py at master · Gabriel-QIN/SLAM (github.com)](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/predict.py)): for predicting Kbhb with/without structures
-   - [hypara.py]([SLAM/codes/hypara.py at master · Gabriel-QIN/SLAM (github.com)](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/hypara.py)): SLAM model hyperparameter
+   - [predict.py](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/predict.py): for predicting Kbhb with/without structures
+   - [hypara.py](https://github.com/Gabriel-QIN/SLAM/blob/master/codes/hypara.py): SLAM model hyperparameter
 2. Datasets
 
-   - Sequence datasets: 
+   - Sequence datasets:
      - [species-specific datasets](https://github.com/Gabriel-QIN/SLAM/blob/master/Datasets) for species specific predictions.
-   - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` flag of [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
+   - Structure datasets: please download from [SLAM server ](http://ai4bio.online/softwares/SLAM/download/)when training the structure-guided model (i.e., add  `structure` flag in the `encoder_list` in [SLAM.py](https://github.com/Gabriel-QIN/SLAM/tree/master/codes/SLAM.py) ).
 3. Models
 
    - Please download the pickled models from [SLAM server](https://ai4bio.online/SLAM/download/).
 4. Case study
 
-   -  [case study.ipynb](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study/case study.ipynb)
-
-
-
+   - [case study](https://github.com/Gabriel-QIN/SLAM/tree/master/case_study)
 
 ## Evaluation on species-specific datasets
 
@@ -138,23 +126,20 @@ For more information, please refer to the source code for [SLAM](https://github.
 
 ```sh
 dataset=Datasets
-sp=general
 gpu=0
-python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_general_prediction --train ${dataset}/${sp}_train_ratio_all.fa --test Datasets/${sp}_test_ratio_all.fa --gpu ${gpu} --seed 2024
+for sp in general human mouse false_smut
+   do python codes/SLAM.py --encoder cnn,lstm,fea,plm,gnn --project SLAM_${sp}_prediction --train ${dataset}/${sp}_train_ratio_all.fa --test Datasets/${sp}_test_ratio_all.fa --gpu ${gpu} --seed 2024
+done
 ```
 
 ![species-specific results](./assets/AUROC.png)
 
-
-
-|    Species    | Accuracy | Recall | Precision | F1-score | Specificity |  MCC  |  AUC  | AUPRC |
-| :-----------: | :------: | :----: | :-------: | :------: | :---------: | :---: | :---: | :---: |
-|    General    |  0.892   | 0.609  |   0.337   |  0.434   |    0.913    | 0.400 | 0.890 | 0.369 |
-| *H. sapiens*  |  0.938   | 0.469  |   0.374   |  0.416   |    0.961    | 0.386 | 0.899 | 0.355 |
-| *M. musculus* |  0.901   | 0.679  |   0.583   |  0.627   |    0.932    | 0.572 | 0.907 | 0.595 |
-|  *U. viren*   |  0.898   | 0.702  |   0.455   |  0.552   |    0.917    | 0.513 | 0.923 | 0.561 |
-
-
+|     Species     | Accuracy | Recall | Precision | F1-score | Specificity |  MCC  |  AUC  | AUPRC |
+| :-------------: | :------: | :----: | :-------: | :------: | :---------: | :---: | :---: | :---: |
+|     General     |  0.892  | 0.609 |   0.337   |  0.434  |    0.913    | 0.400 | 0.890 | 0.369 |
+| *H. sapiens* |  0.938  | 0.469 |   0.374   |  0.416  |    0.961    | 0.386 | 0.899 | 0.355 |
+| *M. musculus* |  0.901  | 0.679 |   0.583   |  0.627  |    0.932    | 0.572 | 0.907 | 0.595 |
+|  *U. viren*  |  0.898  | 0.702 |   0.455   |  0.552  |    0.917    | 0.513 | 0.923 | 0.561 |
 
 ### 2. Comparison with other machine learning algorithms
 
@@ -165,8 +150,6 @@ python plot.py
 
 ![species-specific results](./Plots/logits/AUROC.png)
 
-
-
 ## Case study on AHCY
 
 ```sh
@@ -174,7 +157,7 @@ cd codes
 python predict.py
 ```
 
-AHCY, short for S-adenosyl-L-homocysteine hydrolase, is the only enzyme that can hydrolyze SAH in mammalian[1]. In human cells, it is reported that the loss of AHCY is a causal factor for embryonic lethality[2], and the deficiency can lead to numerous diseases, including neurological disorders, cancer (e.g., hepatocellular carcinoma), early childhood death, and myopathy[3].  Despite the functional investigation of AHCY by previous experimental studies, its regulation remains largely underexplored. Previous studies had already confirmed that AHCY is a bona fide target of Kbhb which could potentially exerts impact on the enzymatic activity[4]. They found that the AHCY activity was attenuated after an 8h treatment of 10mM Na-β-OHB treatment[4]. 
+AHCY, short for S-adenosyl-L-homocysteine hydrolase, is the only enzyme that can hydrolyze SAH in mammalian[1]. In human cells, it is reported that the loss of AHCY is a causal factor for embryonic lethality[2], and the deficiency can lead to numerous diseases, including neurological disorders, cancer (e.g., hepatocellular carcinoma), early childhood death, and myopathy[3].  Despite the functional investigation of AHCY by previous experimental studies, its regulation remains largely underexplored. Previous studies had already confirmed that AHCY is a bona fide target of Kbhb which could potentially exerts impact on the enzymatic activity[4]. They found that the AHCY activity was attenuated after an 8h treatment of 10mM Na-β-OHB treatment[4].
 
 Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23526)) and NAD+-bound structure ([PDB: 5W49](https://www.rcsb.org/structure/5W49)), the SLAM model is capable of predicting all six experimentally-verified Kbhb sites. K43, K188, K204, K389 and K405 are predicted with a high score (Sp = 90%), while K20 is predicted with a medium score (Sp = 85%). We further predicted 6potential β-hydroxybutyrylated sites including K46, K226, K318, K322, K388, K401 and K408. For making predictions with your own case, please carefully follow the instructions in the jupyter notebook: `Case_study.ipynb`, and replace files with your sequence and structure.
 
@@ -189,8 +172,6 @@ Given the AHCY sequence (Uniprot: [P23526](https://www.uniprot.org/uniprotkb/P23
 [3] P. Vizan, L. Di Croce, S. Aranda, Functional and Pathological Roles of AHCY, Front Cell Dev Biol 9 (2021) 654344.
 
 [4] K.B. Koronowski, C.M. Greco, H. Huang, *et al*., Ketogenesis impact on liver metabolism revealed by proteomics of lysine beta-hydroxybutyrylation, Cell Rep 36(5) (2021) 109487.
-
-
 
 # Citation
 
@@ -219,8 +200,6 @@ keywords = {Lysine β-hydroxybutyrylation, Graph neural network, Protein languag
 abstract = {Post-translational modifications (PTMs) diversify protein functions by adding/removing chemical groups to certain amino acid. As a newly-reported PTM, lysine β-hydroxybutyrylation (Kbhb) presents a new avenue to functional proteomics. Therefore, accurate and efficient prediction of Kbhb sites is imperative. However, the current experimental methods for identifying PTM sites are often expensive and time-consuming. Up to now, there is no computational method proposed for Kbhb sites detection. To this end, we present the first deep learning-based method, termed SLAM, to in silico identify lysine β-hydroxybutyrylation sites. The performance of SLAM is evaluated on both 5-fold cross-validation and independent test, achieving 0.890, 0.899, 0.907 and 0.923 in terms of AUROC values, on the general and species-specific independent test sets, respectively. As one example, we predicted the potential Kbhb sites in human S-adenosyl-L-homocysteine hydrolase, which is in agreement with experimentally-verified Kbhb sites. In summary, our method could enable accurate and efficient characterization of novel Kbhb sites that are crucial for the function and stability of proteins and could be applied in the structure-guided identification of other important PTM sites. The SLAM online service and source code is available at https://ai4bio.online/SLAM and https://github.com/Gabriel-QIN/SLAM, respectively.}
 }
 ```
-
-
 
 # License
 
